@@ -1,0 +1,58 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.johnny.atcrowdfunding.dao.PermissionDao">
+
+
+    <select id="queryPermissionByPId" parameterType="java.lang.Integer"
+            resultType="com.johnny.atcrowdfunding.model.Permission">
+        select * from permission_menu where pid =  #{pid}
+    </select>
+
+
+    <select id="queryRootPermission" resultType="com.johnny.atcrowdfunding.model.Permission">
+        select * from permission_menu where pid is null;
+    </select>
+
+
+    <select id="queryAllPermission" resultType="com.johnny.atcrowdfunding.model.Permission">
+        select * from permission_menu
+    </select>
+
+    <select id="queryPermissionById" parameterType="java.lang.Integer"
+            resultType="com.johnny.atcrowdfunding.model.Permission">
+        select * from permission_menu where id = #{id}
+    </select>
+
+
+    <select id="queryPermissionsByUserId" parameterType="java.lang.Integer" resultType="com.johnny.atcrowdfunding.model.Permission">
+        select *
+        from  permission_menu
+        where id in
+          (
+            select permissionId
+            from role_permission
+            where roleId in
+            (
+              select roleId
+              from user_role
+              where userId = #{id}
+            )
+          )
+    </select>
+
+
+    <insert id="addPermission" parameterType="com.johnny.atcrowdfunding.model.Permission">
+        insert into permission_menu(name,pid,url,icon,open,iconClass) values(#{name},#{pid} ,#{url} , #{icon} , #{open} , #{iconClass})
+    </insert>
+
+    <update id="editPermission" parameterType="com.johnny.atcrowdfunding.model.Permission">
+        update permission_menu set name = #{name} , url = #{url} ,icon = #{icon} ,iconClass = #{iconClass}
+        where id = #{id}
+    </update>
+
+    <delete id="deletePermission" parameterType="java.lang.Integer">
+        delete from permission_menu where id = #{id}
+    </delete>
+</mapper>

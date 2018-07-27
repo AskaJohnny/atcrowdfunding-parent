@@ -1,0 +1,96 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.johnny.atcrowdfunding.dao.RoleDao">
+
+    <select id="queryAllRoles" resultType="com.johnny.atcrowdfunding.model.Role">
+        select role_name roleName , id ,create_time createTime from role;
+    </select>
+
+
+    <!--查询 用户id 的所有role -->
+    <select id="queryRoleByUserId" parameterType="java.lang.Integer" resultType="com.johnny.atcrowdfunding.model.Role">
+        select  r.id , role_name roleName
+        from user_role ur
+        left join role r on r.id = ur.roleId
+        where userId = #{id}
+    </select>
+
+    <!--查询 用户id 没有的 role -->
+    <select id="queryNoRoleUserId" parameterType="java.lang.Integer" resultType="com.johnny.atcrowdfunding.model.Role">
+       select id ,role_name roleName
+       from role
+        where id not in
+         (
+            select distinct r.id
+             from role r
+             left  join user_role  ur on ur.roleId = r.id
+              where  ur.userId = #{id}
+          )
+
+    </select>
+
+
+    <select id="queryRoleForMap" parameterType="java.util.Map" resultType="com.johnny.atcrowdfunding.model.Role">
+        select id , role_name roleName , create_time createTime
+        from role
+        <where>
+            <if test="queryCondition != null">
+                AND role_name like CONCAT('%' , #{queryCondition} , '%' )
+            </if>
+        </where>
+        limit #{fromCount} , #{pageSize}
+    </select>
+
+    <select id="queryRoleCount" parameterType="java.util.Map" resultType="java.lang.Integer">
+        select count(*)
+        from role
+        <where>
+            <if test="queryCondition != null">
+                AND role_name like CONCAT('%' , #{queryCondition} , '%' )
+            </if>
+        </where>
+    </select>
+
+    <insert id="insertRole" parameterType="com.johnny.atcrowdfunding.model.Role">
+      insert into role(role_name , create_time) values(#{roleName} , #{createTime})
+    </insert>
+
+    <update id="updateRole" parameterType="com.johnny.atcrowdfunding.model.Role">
+      update role set role_name = #{role_name} where id = #{id}
+    </update>
+
+    <delete id="deleteRole" parameterType="java.lang.Integer">
+        delete  from role where id = #{id}
+    </delete>
+
+    <insert id="addUserRoleMiddle" parameterType="java.util.Map">
+        insert into user_role(userId,roleId)
+        values
+        <foreach collection="roleIds" item="roleId" separator=",">
+            (#{userId} , #{roleId})
+        </foreach>
+    </insert>
+
+
+    <delete id="removeUserRoleMiddle" parameterType="java.util.Map">
+        delete from user_role where userId = #{userId} and roleId in
+        <foreach collection="roleIds" item="roleId" separator="," open="(" close=")">
+            #{roleId}
+        </foreach>
+    </delete>
+
+
+    <insert id="addRolePermission" parameterType="java.util.Map">
+        insert into role_permission(roleId,permissionId)
+        values
+        <foreach collection="permissionIds" item="permissionId" separator=",">
+            (#{roleId},#{permissionId})
+        </foreach>
+    </insert>
+
+    <delete id="deleteRolePermission" parameterType="java.lang.Integer">
+        delete from role_permission where roleId = #{roleId}
+    </delete>
+</mapper>

@@ -1,0 +1,419 @@
+<!DOCTYPE html>
+<html lang="UTF-8" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="description" content="">
+    <meta name="author" content="">
+
+    <link rel="stylesheet" th:href="@{/webjars/bootstrap/3.3.7/css/bootstrap.css}"
+          href="bootstrap/css/bootstrap.min.css">
+    <link rel="stylesheet" th:href="@{/css/font-awesome.min.css}" href="css/font-awesome.min.css">
+    <link rel="stylesheet" th:href="@{/css/main.css}" href="css/main.css">
+    <style>
+        .tree li {
+            list-style-type: none;
+            cursor: pointer;
+        }
+
+        table tbody tr:nth-child(odd) {
+            background: #F4F4F4;
+        }
+
+        table tbody td:nth-child(even) {
+            color: #C00;
+        }
+    </style>
+</head>
+
+<body>
+
+<div th:replace="common/top::navigation('用户维护')"></div>
+
+<div class="container-fluid">
+    <div class="row">
+        <div th:replace="common/left::leftsidebar('/user/userIndex/')"></div>
+        <div class="col-sm-9 col-sm-offset-3 col-md-10 col-md-offset-2 main">
+            <div id="userList" class="panel panel-default">
+                <div class="panel-heading">
+                    <h3 class="panel-title"><i class="glyphicon glyphicon-th"></i> 数据列表</h3>
+                </div>
+                <div class="panel-body">
+                    <form class="form-inline" role="form" style="float:left;">
+                        <div class="form-group has-feedback">
+                            <div class="input-group">
+                                <div class="input-group-addon">查询条件</div>
+                                <input id="queryCondition" class="form-control has-success" type="text"
+                                       placeholder="请输入查询条件">
+                            </div>
+                        </div>
+                        <button onclick="queryUser()" type="button" class="btn btn-warning"><i
+                                class="glyphicon glyphicon-search"></i> 查询
+                        </button>
+                    </form>
+                    <button onclick="deleteUsers()" type="button" class="btn btn-danger"
+                            style="float:right;margin-left:10px;"><i
+                            class=" glyphicon glyphicon-remove"></i> 删除
+                    </button>
+                    <button type="button" class="btn btn-primary" style="float:right;"
+                            onclick="addPage(0)"><i class="glyphicon glyphicon-plus"></i> 新增
+                    </button>
+                    <br>
+                    <hr style="clear:both;">
+                    <div class="table-responsive">
+                        <table class="table  table-bordered">
+                            <thead>
+                            <tr>
+                                <th width="30"></th>
+                                <th width="30"><input type="checkbox" id="checkAll"></th>
+                                <th>账号</th>
+                                <th>名称</th>
+                                <th>邮箱地址</th>
+                                <th width="100">操作</th>
+                            </tr>
+                            </thead>
+                            <tbody id="tableContent">
+
+
+                            </tbody>
+                            <tfoot>
+                            <tr>
+                                <td colspan="6" align="center">
+                                    <ul class="pagination">
+
+                                    </ul>
+                                </td>
+                            </tr>
+                            </tfoot>
+                        </table>
+                    </div>
+                </div>
+            </div>
+
+            <!--新增 或 修改 显示的 -->
+            <div id="addPage" style="display: none">
+                <input type="hidden" id="userId" value="0">
+                <ol class="breadcrumb">
+                    <li><a href="#">首页</a></li>
+                    <li><a href="#">数据列表</a></li>
+                    <li id="upaddli" class="active">新增</li>
+                </ol>
+                <div class="panel panel-default">
+                    <div class="panel-heading">表单数据
+                        <div style="float:right;cursor:pointer;" data-toggle="modal" data-target="#myModal"><i
+                                class="glyphicon glyphicon-question-sign"></i></div>
+                    </div>
+                    <div class="panel-body">
+                        <form id="userForm" method="post" role="form">
+                            <div class="form-group">
+                                <label for="account">登陆账号</label>
+                                <input id="account" name="account" type="text" class="form-control"
+                                       placeholder="请输入登陆账号">
+                            </div>
+                            <div class="form-group">
+                                <label for="name">用户名称</label>
+                                <input id="name" name="name" type="text" class="form-control"
+                                       placeholder="请输入用户名称">
+                            </div>
+
+                            <div class="form-group">
+                                <label for="email">邮箱地址</label>
+                                <input id="email" name="email" type="email" class="form-control"
+                                       placeholder="请输入邮箱地址">
+                                <p class="help-block label label-warning">请输入合法的邮箱地址, 格式为： xxxx@xxxx.com</p>
+                            </div>
+                            <button onclick="inserUser()" type="button" class="btn btn-success">
+                                <i id="upaddClass" class="glyphicon glyphicon-pencil"></i> <span id="upadd">新增</span>
+                            </button>
+                            <button onclick="reset()" type="button" class="btn btn-danger"><i
+                                    class="glyphicon glyphicon-refresh"></i>
+                                重置
+                            </button>
+                            <button onclick="returnPage()" type="button" class="btn btn-primary">返回</button>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script th:src="@{/webjars/jquery/3.3.1/jquery.js}" src="jquery/jquery-2.1.1.min.js"></script>
+<script th:src="@{/webjars/bootstrap/3.3.7/js/bootstrap.js}" src="bootstrap/js/bootstrap.min.js"></script>
+<script th:src="@{/script/docs.min.js}" src="script/docs.min.js"></script>
+<script th:src="@{/webjars/github-com-sentsin-layer/3.0.3/src/layer.js}"></script>
+<script type="text/javascript">
+    $(function () {
+        $(".list-group-item").click(function () {
+            if ($(this).find("ul")) {
+                $(this).toggleClass("tree-closed");
+                if ($(this).hasClass("tree-closed")) {
+                    $("ul", this).hide("fast");
+                } else {
+                    $("ul", this).show("fast");
+                }
+            }
+        });
+        chageNum(1);
+
+        //点击全选，把所有的checkbox 选中
+        $("#checkAll").click(function () {
+            var flg = this.checked;
+            $("#tableContent input[type=checkbox]").each(function () {
+                this.checked = flg;
+            })
+        });
+
+
+    });
+    $("tbody .btn-success").click(function () {
+        window.location.href = "assignRole.html";
+    });
+    $("tbody .btn-primary").click(function () {
+        window.location.href = "edit.html";
+    });
+
+
+    function msg(msg) {
+        layer.msg(msg, {icon: 0, time: 2000, anim: 6})
+    }
+
+
+    //model 0：单个用户删除 1:批量用户删除
+    function delUser(index, id, model) {
+        $.ajax({
+            type: "post",
+            url: "/user/del/" + id,
+            data: {
+                _method: "DELETE",
+            },
+            success: function (result) {
+                if (model == 1) {
+                } else {
+                    if (result.success) {
+                        layer.msg("已删除", {time: 1000}, function () {
+                            layer.close(index);
+                            chageNum(globPageNum);
+                        });
+                    } else {
+                        layer.msg("删除失败", {time: 1000}, function () {
+                            layer.close(index);
+                            chageNum(globPageNum);
+                        });
+                    }
+                }
+            }
+        })
+    }
+
+    //删除单条记录 ，用resultful风格删除
+    function deleteUser(user) {
+        layer.confirm("确认要删除 " + user.account + " 信息", {icon: 3, title: '提示'}, function (index) {
+            delUser(index, user.id, 0);
+        }, function (index) {
+            layer.close(index);
+        })
+    }
+
+    //可以用 $("form").serialize() 方法获取表单的 选中的checkbox 的 value值 来做
+    function deleteUsers2() {
+    }
+
+    function deleteUsers() {
+        if ($("#tableContent input[type=checkbox]:checked").length == 0) {
+            layer.msg("请选择要删除的用户", {icon: 3, time: 1000, anim: 6})
+            return;
+        }
+
+        layer.confirm("确认要批量删除？", {icon: 3, title: '提示'}, function (index) {
+            $("#tableContent input[type=checkbox]:checked").each(function () {
+                delUser(index, this.value, 1);
+            })
+            layer.close(index);
+            layer.msg("已删除", {time: 1000}, function () {
+                chageNum(globPageNum);
+            })
+        })
+    }
+
+    //重置按钮
+    function reset() {
+        $("#userForm")[0].reset();
+    }
+
+    //返回按钮
+    function returnPage() {
+        chageNum(globPageNum);
+        $("#addPage").css("display", "none");
+        $("#userList").show();
+    }
+
+    //回显 更新的用户信息
+    function updateUser(data) {
+
+        $("#upadd").text("修改");
+        $("#upaddClass").attr("class", "glyphicon glyphicon-pencil");
+
+        $("#upaddli").text("修改");
+
+
+        $("#name").val(data.name);
+        $("#account").val(data.account);
+        $("#email").val(data.email);
+        $("#userId").val(data.id);
+        $("#userList").css("display", "none");
+        $("#addPage").show();
+    }
+
+    //插入用户、更新用户
+    function inserUser() {
+        var id = $("#userId").val();
+        var account = $("#account").val();
+        var name = $("#name").val();
+        var email = $("#email").val();
+        if ($.trim(account) == "") {
+            msg("请输入账号");
+            return;
+        }
+        if ($.trim(name) == "") {
+            msg("请输入用户名");
+            return;
+        }
+        if ($.trim(email) == "") {
+            msg("请输入Email");
+            return;
+        }
+
+        var index;
+        $.ajax({
+            type: "post",
+            url: "/user/addUser",
+            data: {
+                account: account,
+                name: name,
+                email: email,
+                id: id,
+            },
+            beforeSend: function () {
+                index = layer.load();
+            },
+            success: function (result) {
+                layer.close(index);
+                if (result.success) {
+                    if (id == 0) {
+                        layer.msg("新增成功", {time: 1200}, function () {
+                            returnPage();
+                            // window.location.href = "/user/userIndex"
+                        });
+                    } else {
+                        layer.msg("修改成功", {time: 1200}, function () {
+                            returnPage();
+                            //window.location.href = "/user/userIndex"
+                        });
+                    }
+                    //window.setTimeout("window.location='/user/userIndex'",1200);
+                } else {
+                    layer.msg("新增失败", {icon: 5, time: 2000, anim: 6})
+                }
+            }
+        });
+    }
+
+
+    //到新增页面
+    function addPage(id) {
+
+        $("#upadd").text("新增");
+        $("#upaddClass").attr("class", "glyphicon glyphicon-plus");
+
+        $("#upaddli").text("新增");
+        $("#userId").val("0");
+        $("#name").val("");
+        $("#account").val("");
+        $("#email").val("");
+        $("#userList").css("display", "none");
+        $("#addPage").show();
+    }
+
+    //查询按钮
+    function queryUser() {
+        chageNum(1);
+    }
+
+    //全局的 当前 页码
+    var globPageNum;
+
+    //去 分配页面
+    function assignPage(id) {
+        window.location.href = "/user/assign/" + id;
+    }
+
+    //查询方法，根据页码数
+    function chageNum(pageNum) {
+        globPageNum = pageNum;
+        var queryCondition = $("#queryCondition").val();
+
+        var index;
+        $.ajax({
+            type: "POST",
+            url: "/user/userForAjax",
+            data: {
+                pageNum: pageNum,
+                queryCondition: queryCondition
+            },
+            beforeSend: function () {
+                $("#tableContent").html("");
+                $(".pagination").html("");
+                index = layer.load();
+            },
+            success: function (result) {
+                globPageNum = result.data.pageNum;
+                layer.close(index);
+                if (result.success) {
+                    var tableContent = "";
+                    var pagination = "";
+                    $.each(result.data.content, function (i, user) {
+                        tableContent += '<tr>';
+                        tableContent += '        <td >' + (i + 1) + '</td>';
+                        tableContent += '        <td><input value="' + user.id + '" type="checkbox"></td>';
+                        tableContent += '        <td >' + user.account + '</td>';
+                        tableContent += '        <td >' + user.name + '</td>';
+                        tableContent += '        <td >' + user.email + '</td>';
+                        tableContent += '        <td>';
+                        tableContent += '        <button onclick="assignPage(' + user.id + ')" type="button" class="btn btn-success btn-xs">';
+                        tableContent += '<i class= "glyphicon glyphicon-check"></i></button>';
+                        tableContent += "    <button  onclick='updateUser(" + JSON.stringify(user) + ")'  type='button' class='btn btn-primary btn-xs'>";
+                        tableContent += '<i class= "glyphicon glyphicon-pencil"></i></button>';
+                        tableContent += "    <button type='button' class='btn btn-danger btn-xs' onclick='deleteUser(" + JSON.stringify(user) + ")'>";
+                        tableContent += '<i class= "glyphicon glyphicon-remove" ></i></button>';
+                        tableContent += '    </td>';
+                        tableContent += '</tr>';
+                        $("#tableContent").html(tableContent);
+                    });
+
+                    if (pageNum > 1) {
+                        pagination += '<li> <a href="#" onclick="chageNum(' + (pageNum - 1) + ')" >上一页</a></li>'
+                    }
+
+                    for (var i = 1; i <= result.data.sumPageNum; i++) {
+                        if (i == pageNum) {
+                            pagination += '<li class="active"> <a  onclick="chageNum(' + i + ')" href="#">' + i + '</a></li>'
+                        } else {
+                            pagination += '<li> <a onclick="chageNum(' + i + ')" href="#">' + i + '</a></li>'
+                        }
+                    }
+                    if (pageNum < result.data.sumPageNum) {
+                        pagination += '<li> <a href="#" onclick="chageNum(' + (pageNum + 1) + ')">下一页 </a> </li>'
+                    }
+                    $(".pagination").html(pagination);
+
+                }
+            }
+        });
+    }
+
+
+</script>
+</body>
+</html>

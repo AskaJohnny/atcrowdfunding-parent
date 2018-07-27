@@ -1,0 +1,31 @@
+Manifest-Version: 1.0
+Class-Path: jackson-datatype-jdk8-2.9.6.jar spring-tx-5.0.7.RELEASE.ja
+ r tomcat-embed-core-8.5.31.jar jackson-annotations-2.9.0.jar spring-w
+ ebmvc-5.0.7.RELEASE.jar spring-boot-starter-web-2.0.3.RELEASE.jar spr
+ ing-boot-starter-logging-2.0.3.RELEASE.jar spring-core-5.0.7.RELEASE.
+ jar spring-boot-autoconfigure-2.0.3.RELEASE.jar spring-jdbc-5.0.7.REL
+ EASE.jar jackson-datatype-jsr310-2.9.6.jar spring-boot-starter-2.0.3.
+ RELEASE.jar jquery-3.3.1.jar spring-boot-starter-jdbc-1.5.10.RELEASE.
+ jar spring-boot-starter-json-2.0.3.RELEASE.jar thymeleaf-spring5-3.0.
+ 9.RELEASE.jar HikariCP-2.7.9.jar bootstrap-3.3.7.jar slf4j-api-1.7.25
+ .jar logback-core-1.2.3.jar mybatis-3.4.6.jar log4j-api-2.10.0.jar at
+ toparser-2.0.4.RELEASE.jar logback-classic-1.2.3.jar github-com-sents
+ in-layer-3.0.3.jar spring-jdbc-4.3.14.RELEASE.jar spring-aop-5.0.7.RE
+ LEASE.jar spring-beans-5.0.7.RELEASE.jar spring-jcl-5.0.7.RELEASE.jar
+  mybatis-spring-1.3.2.jar thymeleaf-3.0.9.RELEASE.jar jackson-module-
+ parameter-names-2.9.6.jar mybatis-spring-boot-starter-1.3.2.jar hiber
+ nate-validator-6.0.10.Final.jar mybatis-spring-boot-autoconfigure-1.3
+ .2.jar tomcat-embed-websocket-8.5.31.jar jboss-logging-3.3.2.Final.ja
+ r thymeleaf-extras-java8time-3.0.1.RELEASE.jar jackson-core-2.9.6.jar
+  ztree-3.5.0.jar spring-tx-4.3.14.RELEASE.jar tomcat-embed-el-8.5.31.
+ jar mysql-connector-java-5.1.46.jar spring-expression-5.0.7.RELEASE.j
+ ar spring-context-5.0.7.RELEASE.jar unbescape-1.1.5.RELEASE.jar class
+ mate-1.3.4.jar tomcat-juli-8.5.27.jar spring-boot-starter-tomcat-2.0.
+ 3.RELEASE.jar jquery-3.3.1.jar jul-to-slf4j-1.7.25.jar spring-web-5.0
+ .7.RELEASE.jar log4j-to-slf4j-2.10.0.jar spring-boot-starter-thymelea
+ f-2.0.3.RELEASE.jar tomcat-jdbc-8.5.27.jar spring-boot-starter-jdbc-2
+ .0.3.RELEASE.jar spring-boot-2.0.3.RELEASE.jar snakeyaml-1.19.jar jav
+ ax.annotation-api-1.3.2.jar jackson-databind-2.9.6.jar validation-api
+ -2.0.1.Final.jar
+Main-Class: com.johnny.atcrowdfunding.SpringBootWebApplication
+

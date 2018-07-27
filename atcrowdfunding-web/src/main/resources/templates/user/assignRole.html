@@ -1,0 +1,207 @@
+<!DOCTYPE html>
+<html lang="zh-CN" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="description" content="">
+    <meta name="author" content="">
+
+    <link rel="stylesheet" th:href="@{/webjars/bootstrap/3.3.7/css/bootstrap.css}"
+          href="bootstrap/css/bootstrap.min.css">
+    <link rel="stylesheet" th:href="@{/css/font-awesome.min.css}" href="css/font-awesome.min.css">
+    <link rel="stylesheet" th:href="@{/css/main.css}" href="css/main.css">
+    <link rel="stylesheet" th:href="@{/css/doc.min.css}" href="css/doc.min.css">
+    <style>
+        .tree li {
+            list-style-type: none;
+            cursor: pointer;
+        }
+    </style>
+</head>
+
+<body>
+
+<nav class="navbar navbar-inverse navbar-fixed-top" role="navigation">
+    <div class="container-fluid">
+        <div class="navbar-header">
+            <div><a class="navbar-brand" style="font-size:32px;" href="user.html">众筹平台 - 用户维护</a></div>
+        </div>
+        <div id="navbar" class="navbar-collapse collapse">
+            <ul class="nav navbar-nav navbar-right">
+                <li style="padding-top:8px;">
+                    <div class="btn-group">
+                        <button type="button" class="btn btn-default btn-success dropdown-toggle"
+                                data-toggle="dropdown">
+                            <i class="glyphicon glyphicon-user"></i> 张三 <span class="caret"></span>
+                        </button>
+                        <ul class="dropdown-menu" role="menu">
+                            <li><a href="#"><i class="glyphicon glyphicon-cog"></i> 个人设置</a></li>
+                            <li><a href="#"><i class="glyphicon glyphicon-comment"></i> 消息</a></li>
+                            <li class="divider"></li>
+                            <li><a href="login.html"><i class="glyphicon glyphicon-off"></i> 退出系统</a></li>
+                        </ul>
+                    </div>
+                </li>
+                <li style="margin-left:10px;padding-top:8px;">
+                    <button type="button" class="btn btn-default btn-danger">
+                        <span class="glyphicon glyphicon-question-sign"></span> 帮助
+                    </button>
+                </li>
+            </ul>
+            <form class="navbar-form navbar-right">
+                <input type="text" class="form-control" placeholder="Search...">
+            </form>
+        </div>
+    </div>
+</nav>
+
+<div th:replace="common/top::navigation"></div>
+
+<div class="container-fluid">
+    <div class="row">
+
+        <div th:replace="common/left::leftsidebar('/user/userIndex/')"></div>
+
+        <div class="col-sm-9 col-sm-offset-3 col-md-10 col-md-offset-2 main">
+            <ol class="breadcrumb">
+                <li><a href="#">首页</a></li>
+                <li><a href="#">数据列表</a></li>
+                <li class="active">分配角色</li>
+            </ol>
+            <div class="panel panel-default">
+                <div class="panel-body">
+                    <form id="roleForm" role="form" class="form-inline">
+                        <input type="hidden" name="userId" th:value="${user.id}">
+                        <div class="form-group">
+                            <label>未分配角色列表</label><br>
+                            <select name="unAssignRoleIds" id="roles" class="form-control" multiple size="10"
+                                    style="width:200px;overflow-y:auto;">
+                                <option th:each="role:${userNoRoles}" th:text="${role.roleName}"
+                                        th:value="${role.id}">
+                                </option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <ul>
+                                <li onclick="assignToUser()"
+                                    class="btn btn-default glyphicon glyphicon-chevron-right"></li>
+                                <br>
+                                <li onclick="removeFromUser()" class="btn btn-default glyphicon glyphicon-chevron-left"
+                                    style="margin-top:20px;"></li>
+                            </ul>
+                        </div>
+                        <div class="form-group" style="margin-left:40px;">
+                            <label>已分配角色列表</label><br>
+                            <select name="assignRoleIds" id="userRoles" class="form-control" multiple size="10"
+                                    style="width:200px;overflow-y:auto;">
+                                <option th:each="role:${userRoles}" th:text="${role.roleName}"
+                                        th:value="${role.id}">
+
+                                </option>
+
+                            </select>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<div class="modal fade" id="myModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal"><span aria-hidden="true">&times;</span><span
+                        class="sr-only">Close</span></button>
+                <h4 class="modal-title" id="myModalLabel">帮助</h4>
+            </div>
+            <div class="modal-body">
+                <div class="bs-callout bs-callout-info">
+                    <h4>测试标题1</h4>
+                    <p>测试内容1，测试内容1，测试内容1，测试内容1，测试内容1，测试内容1</p>
+                </div>
+                <div class="bs-callout bs-callout-info">
+                    <h4>测试标题2</h4>
+                    <p>测试内容2，测试内容2，测试内容2，测试内容2，测试内容2，测试内容2</p>
+                </div>
+            </div>
+            <!--
+            <div class="modal-footer">
+              <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+              <button type="button" class="btn btn-primary">Save changes</button>
+            </div>
+            -->
+        </div>
+    </div>
+</div>
+<script th:src="@{/webjars/jquery/3.3.1/jquery.js}" src="jquery/jquery-2.1.1.min.js"></script>
+<script th:src="@{/webjars/bootstrap/3.3.7/js/bootstrap.js}" src="bootstrap/js/bootstrap.min.js"></script>
+<script th:src="@{/script/docs.min.js}" src="script/docs.min.js"></script>
+<script th:src="@{/webjars/github-com-sentsin-layer/3.0.3/src/layer.js}"></script>
+<script type="text/javascript">
+    $(function () {
+        $(".list-group-item").click(function () {
+            if ($(this).find("ul")) {
+                $(this).toggleClass("tree-closed");
+                if ($(this).hasClass("tree-closed")) {
+                    $("ul", this).hide("fast");
+                } else {
+                    $("ul", this).show("fast");
+                }
+            }
+        });
+
+
+    });
+
+    //分配角色给用户
+    function assignToUser() {
+
+        if ($("#roles :selected").length == 0) {
+            layer.msg("请先选择要分配的角色", {time: 1000});
+            return;
+        }
+        //doSomething
+        $.ajax({
+            type: "post",
+            url: "/user/assignRole",
+            data: $("#roleForm").serialize(),
+            success: function (result) {
+                if (result.success) {
+                    layer.msg("分配成功");
+                } else {
+                    layer.msg("分配失败,请重试");
+                }
+            },
+        });
+        $("#userRoles").append($("#roles").find("option:selected"));
+    }
+
+    //解除 用户的 角色
+    function removeFromUser() {
+        if ($("#userRoles").find("option:selected").length == 0) {
+            layer.msg("请先选择要解除的角色", {time: 1000});
+            return;
+        }
+        //do 解除当前用户的角色操作
+        $.ajax({
+            type: "post",
+            url: "/user/removeAssignRole",
+            data: $("#roleForm").serialize(),
+
+            success: function (result) {
+                if (result.success) {
+                    layer.msg("解除成功");
+                } else {
+                    layer.msg("解除失败,请重试");
+                }
+            },
+        });
+        //var removeId = $("#userRoles").find("option:selected").val() - 1;
+        //$('#roles option[value="' + removeId + '"]').after($("#userRoles").find("option:selected"))
+        $('#roles').append($("#userRoles").find("option:selected"))
+    }
+</script>
+</body>
+</html>

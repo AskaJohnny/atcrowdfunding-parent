@@ -1,0 +1,181 @@
+<!DOCTYPE html>
+<html lang="UTF-8" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="description" content="">
+    <meta name="author" content="">
+
+    <link rel="stylesheet" th:href="@{/webjars/bootstrap/3.3.7/css/bootstrap.css}"
+          href="bootstrap/css/bootstrap.min.css">
+    <link rel="stylesheet" th:href="@{/css/font-awesome.min.css}" href="css/font-awesome.min.css">
+    <link rel="stylesheet" th:href="@{/css/main.css}" href="css/main.css">
+    <style>
+        .tree li {
+            list-style-type: none;
+            cursor: pointer;
+        }
+
+        table tbody tr:nth-child(odd) {
+            background: #F4F4F4;
+        }
+
+        table tbody td:nth-child(even) {
+            color: #C00;
+        }
+    </style>
+</head>
+
+<body>
+
+
+<div th:replace="common/top::navigation('角色维护')"></div>
+
+<div class="container-fluid">
+    <div class="row">
+        <div th:replace="common/left::leftsidebar('/role/rolePage/')"></div>
+
+        <div class="col-sm-9 col-sm-offset-3 col-md-10 col-md-offset-2 main">
+            <div class="panel panel-default">
+                <div class="panel-heading">
+                    <h3 class="panel-title"><i class="glyphicon glyphicon-th"></i> 数据列表</h3>
+                </div>
+                <div class="panel-body">
+                    <form class="form-inline" role="form" style="float:left;">
+                        <div class="form-group has-feedback">
+                            <div class="input-group">
+                                <div class="input-group-addon">查询条件</div>
+                                <input class="form-control has-success" type="text" placeholder="请输入查询条件">
+                            </div>
+                        </div>
+                        <button type="button" class="btn btn-warning"><i class="glyphicon glyphicon-search"></i> 查询
+                        </button>
+                    </form>
+                    <button type="button" class="btn btn-danger" style="float:right;margin-left:10px;"><i
+                            class=" glyphicon glyphicon-remove"></i> 删除
+                    </button>
+                    <button type="button" class="btn btn-primary" style="float:right;"
+                            onclick="window.location.href='form.html'"><i class="glyphicon glyphicon-plus"></i> 新增
+                    </button>
+                    <br>
+                    <hr style="clear:both;">
+                    <div class="table-responsive">
+                        <table class="table  table-bordered">
+                            <thead>
+                            <tr>
+                                <th width="30">#</th>
+                                <th width="30"><input type="checkbox"></th>
+                                <th>名称</th>
+                                <th>添加时间</th>
+                                <th width="100">操作</th>
+                            </tr>
+                            </thead>
+                            <tbody id="tableContent">
+
+                            </tbody>
+                            <tfoot>
+                            <tr>
+                                <td colspan="6" align="center">
+                                    <ul id="pagination" class="pagination">
+
+                                    </ul>
+                                </td>
+                            </tr>
+                            </tfoot>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script th:src="@{/webjars/jquery/3.3.1/jquery.js}" src="jquery/jquery-2.1.1.min.js"></script>
+<script th:src="@{/webjars/bootstrap/3.3.7/js/bootstrap.js}" src="bootstrap/js/bootstrap.min.js"></script>
+<script th:src="@{/script/docs.min.js}" src="script/docs.min.js"></script>
+<script th:src="@{/webjars/github-com-sentsin-layer/3.0.3/src/layer.js}"></script>
+<script type="text/javascript">
+    $(function () {
+        $(".list-group-item").click(function () {
+            if ($(this).find("ul")) {
+                $(this).toggleClass("tree-closed");
+                if ($(this).hasClass("tree-closed")) {
+                    $("ul", this).hide("fast");
+                } else {
+                    $("ul", this).show("fast");
+                }
+            }
+        });
+        chageNum(1);
+    });
+
+    $("tbody .btn-success").click(function () {
+        window.location.href = "assignPermission.html";
+    });
+
+    function assignPermissionPage(id) {
+        window.location.href = "/role/assignPermissionPage/" + id;
+    }
+
+
+    var globPageNum;
+    function chageNum(pageNum) {
+        globPageNum = pageNum;
+        var index;
+        $.ajax({
+            type: "get",
+            url: "/role/queryAllRoleForAjax",
+            data: {
+                pageNum: pageNum
+            },
+            beforeSend: function () {
+                index = layer.load();
+            },
+            success: function (result) {
+                layer.close(index);
+                if (result.success) {
+                    var tableContent = "";
+                    var pagination = "";
+                    $.each(result.data.content, function (i, role) {
+                        tableContent += "<tr>";
+                        tableContent += " <td>" + (i + 1) + "</td>";
+                        tableContent += " <td><input value=" + role.id + " type='checkbox'></td>";
+                        tableContent += " <td>" + role.roleName + "</td>";
+                        tableContent += " <td>" + role.createTime + "</td>";
+                        tableContent += " <td><button type='button' onclick='assignPermissionPage(" + role.id + ")'  class='btn btn-success btn-xs'>";
+                        tableContent += "<i class='glyphicon glyphicon-check'></i></button>";
+                        tableContent += "<button type='button' class='btn btn-primary btn-xs'>";
+                        tableContent += "<i class='glyphicon glyphicon-pencil'></i></button>";
+                        tableContent += "<button type='button' class='btn btn-danger btn-xs'>";
+                        tableContent += "<i class='glyphicon glyphicon-remove'></i></button>";
+                        tableContent += "</td>"
+                        tableContent += "</tr>"
+                        $("#tableContent").html(tableContent);
+                    });
+
+                    if (pageNum > 1) {
+                        pagination += "<li class='disabled'><a href=" + chageNum(pageNum - 1) + ">上一页</a></li>";
+                    }
+                    for (var i = 1; i < result.data.sumPageNum; i++) {
+                        if (i == pageNum) {
+                            pagination += "<li class='active'><a href='#' onclick=" + chageNum(i) + ">1 <span class='sr-only'>" + i + "</span></a></li>";
+                        } else {
+                            pagination += "<li><a onclick=" + chageNum(i) + " href='#'>i</a></li>";
+                        }
+                    }
+
+
+                    if (pageNum < result.data.sumPageNum) {
+                        pagination += " <li><a onclick=" + chageNum(pageNum - 1) + "  href='#'>下一页</a></li>";
+                    }
+
+                    $("#pagination").html(pagination);
+                }
+            },
+        });
+
+    }
+</script>
+</body>
+</html>
